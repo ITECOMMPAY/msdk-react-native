@@ -12,11 +12,106 @@ const MsdkReactNative = NativeModules.MsdkReactNative
       {},
       {
         get() {
+          console.log('NativeModules.MsdkReactNative', NativeModules.MsdkReactNative);
           throw new Error(LINKING_ERROR);
         },
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return MsdkReactNative.multiply(a, b);
-}
+    export type EcmpPaymentInfo = {
+      projectID: number;
+      paymentID: string;
+      paymentAmount: number;
+      paymentCurrency: string; 
+      paymentDescription?: string; 
+      customerID?: string;
+      regionCode?: string; 
+      token?: string;
+      languageCode?: string;
+      receiptData?: string;
+      hideSavedWallets?: boolean;
+      signature?: string;
+  }
+  
+  export type EcmpPaymentOptions = {
+      actionType: EcmpActionType;
+      paymentInfo: EcmpPaymentInfo;
+      isDarkTheme?: boolean;
+      mockModeType: EcmpMockModeType;
+      screenDisplayModes?: EcmpScreenDisplayMode[];
+      additionalFields?: EcmpAdditionalField[];
+      recipientInfo?: EcmpRecipientInfo;
+      recurrentData?: EcmpRecurrentData;
+      hideScanningCards?: boolean;
+      googleMerchantId?: string;
+      googleMerchantName?: string;
+      googleIsTestEnvironment?: boolean;
+      applePayMerchantID?: string;
+      applePayDescription?: string;
+      applePayCountryCode?: string;
+      brandColor?: string;
+      storedCardType?: number;
+  }
+  
+  export enum EcmpActionType {
+      Sale = 1,
+      Auth = 2,
+      Tokenize = 3,
+      Verify = 4,
+  }
+  
+  export enum EcmpMockModeType {
+      disabled = 1,
+      success = 2,
+      decline = 3
+  }
+  
+  export enum EcmpScreenDisplayMode {
+      hideSuccessFinalPage = 1,
+      hideDeclineFinalPage = 2
+  }
+  
+  export type EcmpAdditionalField = {
+      type: string;
+      value: string;
+  }
+  
+  export type EcmpRecurrentData = {
+      register: boolean;
+      type?: string;
+      expiryDay?: string;
+      expiryMonth?: string;
+      expiryYear?: string;
+      period?: string;
+      interval?: number;
+      time?: string;
+      startDate?: string;
+      scheduledPaymentID?: string;
+      amount?: number;
+      schedule?: EcmpRecurrentDataSchedule[];
+  }
+  
+  export type EcmpRecurrentDataSchedule = {
+      date?: string;
+      amount?: bigint;
+  }
+  
+  export type EcmpRecipientInfo = {
+      walletOwner?: string;
+      walletId?: string;
+      country?: string;
+      pan?: string;
+      cardHolder?: string;
+      address?: string;
+      city?: string;
+      stateCode?: string;
+  }
+  
+  export const initializePayment = (params: EcmpPaymentOptions) => {
+      MsdkReactNative.initializePaymentWithOptions(params)
+  }
+  
+  export const getParamsForSignature = (params: EcmpPaymentInfo): string => {
+      return MsdkReactNative.getParamsForSignature(params)
+  }
+  
