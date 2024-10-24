@@ -107,8 +107,13 @@ const MsdkReactNative = NativeModules.MsdkReactNative
       stateCode?: string;
   }
   
-  export const initializePayment = (params: EcmpPaymentOptions) => {
-      MsdkReactNative.initializePaymentWithOptions(params)
+  export const initializePayment = async (params: EcmpPaymentOptions, callback: (result: any) => void) => {
+    try {
+      const result = await MsdkReactNative.initializePaymentWithOptions(params);
+      callback(result)
+    } catch (error) {
+      callback(error)
+    }
   }
   
   export const getParamsForSignature = (params: EcmpPaymentInfo): string => {

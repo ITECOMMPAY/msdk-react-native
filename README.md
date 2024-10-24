@@ -42,7 +42,11 @@ let paymentOptions: EcmpPaymentOptions = {
     }]
 }
 
-// 4. Open the payment form
+// 4. Open the payment form and handle result
 
-initializePayment(paymentOptions)
+const handleResult = (result) => {
+    console.log(result);
+}
+
+initializePayment(paymentOptions, handleResult)
 ```

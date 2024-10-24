@@ -1,5 +1,6 @@
 package com.msdkreactnative
 
+import android.app.Activity
 import android.content.Intent
 import com.ecommpay.msdk.ui.EcmpActionType
 import com.ecommpay.msdk.ui.EcmpAdditionalField
@@ -11,6 +12,8 @@ import com.ecommpay.msdk.ui.EcmpRecipientInfo
 import com.ecommpay.msdk.ui.EcmpRecurrentData
 import com.ecommpay.msdk.ui.EcmpRecurrentDataSchedule
 import com.ecommpay.msdk.ui.EcmpScreenDisplayMode
+import com.facebook.react.bridge.ActivityEventListener
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -18,7 +21,13 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.ReadableType
 
-class MsdkReactNativeModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class MsdkReactNativeModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ActivityEventListener {
+
+    init {
+        reactContext.addActivityEventListener(this)
+    }
+
+    private var paymentPromise: Promise? = null
 
     override fun getName(): String {
         return "MsdkReactNative"
@@ -75,10 +84,10 @@ class MsdkReactNativeModule(reactContext: ReactApplicationContext) : ReactContex
         // Initialize SDK and open payment form
         val sdk = EcmpPaymentSDK(currentActivity.applicationContext, paymentOptions, mockMode)
 
+        paymentPromise = promise
+
         val intent = sdk.intent
         currentActivity.startActivityForResult(intent, 1001)
-
-
     }
 
     @ReactMethod
@@ -87,6 +96,34 @@ class MsdkReactNativeModule(reactContext: ReactApplicationContext) : ReactContex
 
         return ecmpPaymentInfo.getParamsForSignature()
     }
+
+    override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
+        when (resultCode) {
+            EcmpPaymentSDK.RESULT_SUCCESS -> {
+                val paymentJson = data?.getStringExtra(EcmpPaymentSDK.EXTRA_PAYMENT)
+                val resultMap = Arguments.createMap()
+                resultMap.putString("paymentJson", paymentJson)
+                resultMap.putInt("resultCode", resultCode)
+                paymentPromise?.resolve(resultMap)
+            }
+
+            EcmpPaymentSDK.RESULT_ERROR -> {
+                val errorCode = data?.getStringExtra(EcmpPaymentSDK.EXTRA_ERROR_CODE)
+                val errorMessage = data?.getStringExtra(EcmpPaymentSDK.EXTRA_ERROR_MESSAGE)
+                val resultMap = Arguments.createMap()
+                resultMap.putString("errorCode", errorCode)
+                resultMap.putString("errorMessage", errorMessage)
+                paymentPromise?.resolve(resultMap)
+            }
+
+            else -> {
+               paymentPromise?.resolve(resultCode)
+            }
+        }
+        paymentPromise = null
+    }
+
+    override fun onNewIntent(data: Intent?) {}
 
     private fun paymentInfo(map: ReadableMap): EcmpPaymentInfo {
         return EcmpPaymentInfo(
