@@ -1,3 +1,5 @@
+![NPM Version](https://img.shields.io/npm/v/msdk-react-native)
+
 ## Installation
 
 ```sh
