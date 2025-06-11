@@ -79,7 +79,7 @@ class MsdkReactNativeModule(reactContext: ReactApplicationContext) : ReactContex
             isTestEnvironment = params.safeGetBoolean("googleIsTestEnvironment")
         }
 
-        val mockMode = EcmpPaymentSDK.EcmpMockModeType.entries[params.getInt("mockModeType") - 1]
+        val mockMode = EcmpPaymentSDK.EcmpMockModeType.entries[params.getInt("mockModeType")]
 
         // Initialize SDK and open payment form
         val sdk = EcmpPaymentSDK(currentActivity.applicationContext, paymentOptions, mockMode)
