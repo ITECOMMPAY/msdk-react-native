@@ -7,25 +7,22 @@ class MsdkReactNative: NSObject {
     @objc
     func initializePaymentWithOptions(_ options: NSDictionary, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         let sdkFacade: EcommpaySDK = EcommpaySDK()
-        let paymentOptions: PaymentOptions = RCTConvertPaymentOptions.PaymentOptions(options as! [String: Any])
-        
+        let paymentOptions: PaymentOptions = RCTConvertPluginPaymentOptions.buildPaymentOptions(options)
+      
         DispatchQueue.main.async {
             if let rootVC = UIApplication.shared.keyWindow?.rootViewController {
                 sdkFacade.presentPayment(at: rootVC, paymentOptions: paymentOptions) { (result) in
-                    sdkFacade.presentPayment(at: rootVC, paymentOptions: paymentOptions) { (result) in
-                        
-                        resolver(self.mapPaymentResult(result: result))
-                    }
+                    resolver(self.mapPaymentResult(result: result))
                 }
             }
         }
     }
     
     @objc
-    func getParamsForSignature(_ options: NSDictionary) -> String {
-        let paymentOptions: PaymentOptions = RCTConvertPaymentOptions.PaymentOptions(options as! [String: Any])
+  func getParamsForSignature(_ options: NSDictionary, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        let paymentOptions: PaymentOptions = RCTConvertPluginPaymentOptions.buildPaymentOptionsFromInfo(options)
         
-        return paymentOptions.paramsForSignature
+        resolver(paymentOptions.paramsForSignature)
     }
     
     private func mapPaymentResult(result: PaymentResult) -> [String: Any] {

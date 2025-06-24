@@ -6,7 +6,9 @@
 RCT_EXTERN_METHOD(initializePaymentWithOptions:(NSDictionary *)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getParamsForSignature:(NSDictionary *))
+RCT_EXTERN_METHOD(getParamsForSignature:(NSDictionary *)options
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 
 + (BOOL)requiresMainQueueSetup
 {
