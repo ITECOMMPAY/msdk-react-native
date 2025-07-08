@@ -1,4 +1,5 @@
 import { NativeModules, Platform } from 'react-native';
+import * as CryptoJS from 'crypto-js';
 
 const LINKING_ERROR =
   `The package 'msdk-react-native' doesn't seem to be linked. Make sure: \n\n` +
@@ -61,9 +62,9 @@ const MsdkReactNative = NativeModules.MsdkReactNative
   }
   
   export enum EcmpMockModeType {
-      disabled = 1,
-      success = 2,
-      decline = 3
+      disabled,
+      success,
+      decline
   }
   
   export enum EcmpScreenDisplayMode {
@@ -116,7 +117,36 @@ const MsdkReactNative = NativeModules.MsdkReactNative
     }
   }
   
-  export const getParamsForSignature = (params: EcmpPaymentInfo): string => {
-      return MsdkReactNative.getParamsForSignature(params)
+  export const getParamsForSignature = async (params: EcmpPaymentInfo): Promise<string> => {
+      try {
+        const result = await MsdkReactNative.getParamsForSignature(params);
+        return result;
+      } catch (e) {
+        console.error('getParamsForSignature error:', e);
+        return '';
+      }
   }
+
+  export class SignatureGenerator {
+    static generateSignature(paramsToSign: string, secret: string): string { 
+      let signature = '';
+  
+      try {
+        if (!paramsToSign || !secret) {
+          console.error('Missing parameters for signature generation');
+          return '';
+        }
+        
+        const hmacDigest = CryptoJS.HmacSHA512(paramsToSign, secret);
+        signature = CryptoJS.enc.Base64.stringify(hmacDigest);
+        return signature;
+      } catch (e) {
+        console.error('Signature generation error:', e);
+        return '';
+      }
+  
+    }
+  }
+  
+  export default SignatureGenerator;
   
