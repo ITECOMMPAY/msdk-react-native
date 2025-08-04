@@ -41,7 +41,7 @@ fun ReadableMap.safeGetInt(key: String): Int {
 fun ReadableMap.buildPaymentInfo(): EcmpPaymentInfo {
   val signature = getString("signature")
   android.util.Log.d("PaymentInfo", "Signature from JS: $signature")
-  
+
   return EcmpPaymentInfo(
     projectId = getInt("projectID"),
     paymentId = getString("paymentID") ?: "",
@@ -81,7 +81,7 @@ fun ReadableMap.buildRecurrentInfo(): EcmpRecurrentData {
   val schedule = getArray("schedule")?.let { array ->
     mutableListOf<EcmpRecurrentDataSchedule>().apply {
       for (i in 0 until array.size()) {
-        add(array.getMap(i).buildRecurrentInfoSchedule())
+        array.getMap(i)?.buildRecurrentInfoSchedule()?.let { add(it) }
       }
     }
   } ?: listOf()
