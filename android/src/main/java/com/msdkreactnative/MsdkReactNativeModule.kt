@@ -6,7 +6,7 @@ import android.util.Log
 import com.ecommpay.msdk.ui.EcmpActionType
 import com.ecommpay.msdk.ui.EcmpAdditionalField
 import com.ecommpay.msdk.ui.EcmpPaymentOptions
-import com.ecommpay.msdk.ui.EcmpPaymentSDK
+import com.ecommpay.msdk.ui.Ecommpay
 import com.ecommpay.msdk.ui.EcmpScreenDisplayMode
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.Arguments
@@ -40,7 +40,7 @@ class MsdkReactNativeModule(reactContext: ReactApplicationContext) :
     params: ReadableMap,
     promise: Promise,
   ) {
-    val currentActivity = currentActivity ?: return
+    val currentActivity = reactApplicationContext.currentActivity ?: return
 
     val ecmpPaymentInfo = params.getMap("paymentInfo")?.let { it.buildPaymentInfo() }
 
@@ -84,18 +84,22 @@ class MsdkReactNativeModule(reactContext: ReactApplicationContext) :
       isTestEnvironment = params.safeGetBoolean("googleIsTestEnvironment")
 
       // Brand customization
-      params.getString("brandColor")?.let { colorString ->
-        brandColor = colorString
+      params.getString("primaryBrandColor")?.let { colorString ->
+        primaryBrandColor = colorString
+      }
+
+      params.getString("secondaryBrandColor")?.let { colorString ->
+        secondaryBrandColor = colorString
       }
 
       // Stored card type
       storedCardType = params.safeGetInt("storedCardType")
     }
 
-    val mockMode = EcmpPaymentSDK.EcmpMockModeType.entries[params.getInt("mockModeType")]
+    val mockMode = Ecommpay.EcmpMockModeType.entries[params.getInt("mockModeType")]
 
     // Initialize SDK and open payment form
-    val sdk = EcmpPaymentSDK(currentActivity.applicationContext, paymentOptions, mockMode)
+    val sdk = Ecommpay(currentActivity.applicationContext, paymentOptions, mockMode)
 
     paymentPromise = promise
 
@@ -121,23 +125,23 @@ class MsdkReactNativeModule(reactContext: ReactApplicationContext) :
   }
 
   override fun onActivityResult(
-    activity: Activity?,
+    activity: Activity,
     requestCode: Int,
     resultCode: Int,
     data: Intent?,
   ) {
     when (resultCode) {
-      EcmpPaymentSDK.RESULT_SUCCESS -> {
-        val paymentJson = data?.getStringExtra(EcmpPaymentSDK.EXTRA_PAYMENT)
+      Ecommpay.RESULT_SUCCESS -> {
+        val paymentJson = data?.getStringExtra(Ecommpay.EXTRA_PAYMENT)
         val resultMap = Arguments.createMap()
         resultMap.putString("paymentJson", paymentJson)
         resultMap.putInt("resultCode", resultCode)
         paymentPromise?.resolve(resultMap)
       }
 
-      EcmpPaymentSDK.RESULT_ERROR -> {
-        val errorCode = data?.getStringExtra(EcmpPaymentSDK.EXTRA_ERROR_CODE)
-        val errorMessage = data?.getStringExtra(EcmpPaymentSDK.EXTRA_ERROR_MESSAGE)
+      Ecommpay.RESULT_ERROR -> {
+        val errorCode = data?.getStringExtra(Ecommpay.EXTRA_ERROR_CODE)
+        val errorMessage = data?.getStringExtra(Ecommpay.EXTRA_ERROR_MESSAGE)
         val resultMap = Arguments.createMap()
         resultMap.putString("errorCode", errorCode)
         resultMap.putString("errorMessage", errorMessage)
@@ -151,6 +155,6 @@ class MsdkReactNativeModule(reactContext: ReactApplicationContext) :
     paymentPromise = null
   }
 
-  override fun onNewIntent(data: Intent?) {}
+  override fun onNewIntent(data: Intent) {}
 
 }

@@ -46,7 +46,8 @@ export default function App() {
   const [mockModeType, setMockModeType] = useState<EcmpMockModeType>(EcmpMockModeType.disabled);
   const [hideScanningCards, setHideScanningCards] = useState<boolean>(true);
   const [hideSavedWallets, setHideSavedWallets] = useState<boolean>(false);
-  const [brandColor, setBrandColor] = useState<string>('#3498db');
+  const [primaryBrandColor, setPrimaryBrandColor] = useState<string>('#3498db');
+  const [secondaryBrandColor, setSecondaryBrandColor] = useState<string>('#CAB2FF');
   const [storedCardType, setStoredCardType] = useState<string>('');
 
   // Screen Display Modes
@@ -188,7 +189,8 @@ export default function App() {
           applePayMerchantID: applePayMerchantID || undefined,
           applePayDescription: applePayDescription || undefined,
           applePayCountryCode: applePayCountryCode || undefined,
-          brandColor,
+          primaryBrandColor,
+          secondaryBrandColor,
           storedCardType: parseInt(storedCardType) || undefined
         },
         (result) => {
@@ -311,10 +313,18 @@ export default function App() {
 
         <TextInput
           style={dynamicStyles.input}
-          placeholder="Brand Color (#hex)"
-          placeholderTextColor={isDark ? '#8e8e93' : '#999'}
-          value={brandColor}
-          onChangeText={setBrandColor}
+          placeholder="Primary brand Color (#hex)"
+          placeholderTextColor={isDark ? '#4B007C' : '#999'}
+          value={primaryBrandColor}
+          onChangeText={setPrimaryBrandColor}
+        />
+
+        <TextInput
+            style={dynamicStyles.input}
+            placeholder="Secondary brand Color (#hex)"
+            placeholderTextColor={isDark ? '#CAB2FF' : '#999'}
+            value={secondaryBrandColor}
+            onChangeText={setSecondaryBrandColor}
         />
 
         <View style={dynamicStyles.switchRow}>

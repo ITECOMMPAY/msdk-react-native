@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import ecommpaySDK
+import EcommpaySDK
 import React
 
 
@@ -70,7 +70,8 @@ internal struct PluginPaymentOptions: Decodable {
     let applePayDescription: String?
     let applePayCountryCode: String?
     let isDarkTheme: Bool?
-    let brandColor: String?
+    let primaryBrandColor: String?
+    let secondaryBrandColor: String?
     let storedCardType: Int?
     let signature: String?
     
@@ -121,9 +122,13 @@ internal struct PluginPaymentOptions: Decodable {
         }
         
         // Brand customization
-        if let brandColorString = brandColor {
-            sdkPaymentOptions.brandColor = UIColor(hex: brandColorString)
+        if let primaryBrandColorString = primaryBrandColor {
+            sdkPaymentOptions.primaryBrandColor = UIColor(hex: primaryBrandColorString)
         }
+      
+      if let secondaryBrandColorString = secondaryBrandColor {
+          sdkPaymentOptions.secondaryBrandColor = UIColor(hex: secondaryBrandColorString)
+      }
         
         // Stored card type
         if let storedCardType = storedCardType {
