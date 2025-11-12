@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import ecommpaySDK
+import EcommpaySDK
 import React
 
 
@@ -15,7 +15,7 @@ internal enum PluginActionType: Int, Decodable {
   case Auth = 2
   case Tokenize = 3
   case Verify = 4
-    
+
     func map() ->  PaymentOptions.ActionType  {
         if (self == PluginActionType.Auth) {
             return PaymentOptions.ActionType.Auth
@@ -31,7 +31,7 @@ internal enum PluginActionType: Int, Decodable {
 
 internal enum PluginMockModeType: Int, Decodable {
   case DISABLED, SUCCESS, DECLINE
-  
+
   func map() -> MockModeType {
     switch self {
     case PluginMockModeType.SUCCESS:
@@ -46,7 +46,7 @@ internal enum PluginMockModeType: Int, Decodable {
 
 internal enum PluginScreenDisplayMode: Int, Decodable {
     case HIDE_SUCCESS_FINAL_SCREEN, HIDE_DECLINE_FINAL_SCREEN
-    
+
     func map() -> ScreenDisplayMode  {
         if (self == PluginScreenDisplayMode.HIDE_SUCCESS_FINAL_SCREEN) {
             return ScreenDisplayMode.hideDeclineFinalPage
@@ -70,45 +70,47 @@ internal struct PluginPaymentOptions: Decodable {
     let applePayDescription: String?
     let applePayCountryCode: String?
     let isDarkTheme: Bool?
-    let brandColor: String?
+    let primaryBrandColor: String?
+    let secondaryBrandColor: String?
+    let hideFooterLogo: Bool?
     let storedCardType: Int?
     let signature: String?
-    
+
     func map() -> PaymentOptions {
         let sdkPaymentOptions = paymentInfo.mapToPaymentOption()
-        
+
         sdkPaymentOptions.action = actionType.map()
         sdkPaymentOptions.isDarkThemeOn = isDarkTheme ?? false
-      
+
         print("Selected mock type: \(mockModeType.map())")
-      
+
         sdkPaymentOptions.mockModeType = mockModeType.map()
 
-        
+
         // Screen display modes
         if let screenModes = screenDisplayModes {
             let modes = screenModes.map { $0.map() }
             sdkPaymentOptions.screenDisplayModes = Set(modes)
         }
-        
+
         // Additional fields
         if let additionalFields = additionalFields {
             sdkPaymentOptions.additionalFields = additionalFields.map { $0.map() }
         }
-        
+
         // Recipient info
         if let recipientInfo = recipientInfo {
             sdkPaymentOptions.recipientInfo = recipientInfo.map()
         }
-        
+
         // Recurrent data
         if let recurrentData = recurrentData {
             sdkPaymentOptions.recurrentInfo = recurrentData.map()
         }
-        
+
         // Payment options
         sdkPaymentOptions.hideScanningCards = hideScanningCards ?? false
-        
+
         // Apple Pay
         if let applePayCountryCode = applePayCountryCode,
            let applePayMerchantId = applePayMerchantId,
@@ -119,22 +121,30 @@ internal struct PluginPaymentOptions: Decodable {
                 countryCode: applePayCountryCode
             )
         }
-        
+
         // Brand customization
-        if let brandColorString = brandColor {
-            sdkPaymentOptions.brandColor = UIColor(hex: brandColorString)
+        if let primaryBrandColorString = primaryBrandColor {
+            sdkPaymentOptions.primaryBrandColor = UIColor(hex: primaryBrandColorString)
         }
-        
+
+        if let secondaryBrandColorString = secondaryBrandColor {
+            sdkPaymentOptions.secondaryBrandColor = UIColor(hex: secondaryBrandColorString)
+        }
+
+        if let hideFooterLogo = hideFooterLogo {
+            sdkPaymentOptions.hideFooterLogo = hideFooterLogo
+        }
+
         // Stored card type
         if let storedCardType = storedCardType {
             sdkPaymentOptions.storedCardType = NSNumber(value: storedCardType)
         }
-        
+
         // Override signature if provided at top level
         if let topLevelSignature = signature {
             sdkPaymentOptions.signature = topLevelSignature
         }
-        
+
         return sdkPaymentOptions
     }
 }
@@ -142,25 +152,25 @@ internal struct PluginPaymentOptions: Decodable {
 // MARK: - RCTConvert Extensions
 @objc(PaymentOptions)
 class RCTConvertPluginPaymentOptions: RCTConvert {
-  
+
     @objc static func buildPaymentOptionsFromInfo(_ json: NSDictionary) -> PaymentOptions {
       let jsonDict = json as! [String: Any]
-        
+
       let jsonData = try! JSONSerialization.data(withJSONObject: jsonDict, options: [])
-      
+
       let pluginPaymentInfo = try! JSONDecoder().decode(PluginPaymentInfo.self, from: jsonData)
       return pluginPaymentInfo.mapToPaymentOption()
     }
-  
+
     @objc static func buildPaymentOptions(_ json: NSDictionary) -> PaymentOptions {
       let jsonDict = json as! [String: Any]
-      
+
       let jsonData = try! JSONSerialization.data(withJSONObject: jsonDict, options: [])
-    
+
       let pluginPaymentOptions = try! JSONDecoder().decode(PluginPaymentOptions.self, from: jsonData)
       return pluginPaymentOptions.map()
   }
-    
+
 }
 
 extension UIColor {
@@ -168,25 +178,30 @@ extension UIColor {
         let r, g, b, a: CGFloat
 
         if hex.hasPrefix("#") {
-            let start = hex.index(hex.startIndex, offsetBy: 1)
-            let hexColor = String(hex[start...])
+          let start = hex.index(hex.startIndex, offsetBy: 1)
+          var hexColor = String(hex[start...])
 
-            if hexColor.count == 8 {
-                let scanner = Scanner(string: hexColor)
-                var hexNumber: UInt64 = 0
+          if hexColor.count < 8 {
+            hexColor = hexColor + "ff"
+          }
+          
+          if hexColor.count == 8 {
+              let scanner = Scanner(string: hexColor)
+              var hexNumber: UInt64 = 0
 
-                if scanner.scanHexInt64(&hexNumber) {
-                    r = CGFloat((hexNumber & 0xff000000) >> 24) / 255
-                    g = CGFloat((hexNumber & 0x00ff0000) >> 16) / 255
-                    b = CGFloat((hexNumber & 0x0000ff00) >> 8) / 255
-                    a = CGFloat(hexNumber & 0x000000ff) / 255
+              if scanner.scanHexInt64(&hexNumber) {
+                  r = CGFloat((hexNumber & 0xff000000) >> 24) / 255
+                  g = CGFloat((hexNumber & 0x00ff0000) >> 16) / 255
+                  b = CGFloat((hexNumber & 0x0000ff00) >> 8) / 255
+                  a = CGFloat(hexNumber & 0x000000ff) / 255
 
-                    self.init(red: r, green: g, blue: b, alpha: a)
-                    return
-                }
-            }
+                  self.init(red: r, green: g, blue: b, alpha: a)
+                  return
+              }
+          }
         }
 
         return nil
     }
+    
 }

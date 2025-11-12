@@ -1,5 +1,4 @@
 #import <React/RCTBridgeModule.h>
-#import <EcommpaySDK/EcommpaySDK.h>
 
 @interface RCT_EXTERN_MODULE(MsdkReactNative, NSObject)
 

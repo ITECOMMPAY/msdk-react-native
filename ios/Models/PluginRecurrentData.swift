@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import ecommpaySDK
+import EcommpaySDK
 
 internal struct PluginRecurrentData: Decodable {
     let register: Bool
@@ -22,12 +22,12 @@ internal struct PluginRecurrentData: Decodable {
     let amount: Int64?
     let schedule: [PluginRecurrentDataSchedule]?
     
-    func map() -> ecommpaySDK.RecurrentInfo {
-        let recurrentType = ecommpaySDK.RecurrentType(rawValue: type ?? "")
-        let recurrentPeriod = ecommpaySDK.RecurrentPeriod(rawValue: period)
+    func map() -> EcommpaySDK.RecurrentInfo {
+        let recurrentType = EcommpaySDK.RecurrentType(rawValue: type ?? "")
+        let recurrentPeriod = EcommpaySDK.RecurrentPeriod(rawValue: period)
         let mappedSchedule = schedule?.map { $0.map() } ?? []
         
-        return ecommpaySDK.RecurrentInfo(
+        return EcommpaySDK.RecurrentInfo(
             register: register,
             type: recurrentType,
             expiryDay: expiryDay,
@@ -48,8 +48,8 @@ internal struct PluginRecurrentDataSchedule: Decodable {
     let date: String
     let amount: Int
     
-    func map() -> ecommpaySDK.RecurrentInfoSchedule {
-        return ecommpaySDK.RecurrentInfoSchedule(
+    func map() -> EcommpaySDK.RecurrentInfoSchedule {
+        return EcommpaySDK.RecurrentInfoSchedule(
             date: date,
             amount: amount
         )

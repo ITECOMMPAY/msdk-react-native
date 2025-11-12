@@ -23,17 +23,17 @@ const MsdkReactNative = NativeModules.MsdkReactNative
       projectID: number;
       paymentID: string;
       paymentAmount: number;
-      paymentCurrency: string; 
-      paymentDescription?: string; 
+      paymentCurrency: string;
+      paymentDescription?: string;
       customerID?: string;
-      regionCode?: string; 
+      regionCode?: string;
       token?: string;
       languageCode?: string;
       receiptData?: string;
       hideSavedWallets?: boolean;
       signature?: string;
   }
-  
+
   export type EcmpPaymentOptions = {
       actionType: EcmpActionType;
       paymentInfo: EcmpPaymentInfo;
@@ -50,33 +50,35 @@ const MsdkReactNative = NativeModules.MsdkReactNative
       applePayMerchantID?: string;
       applePayDescription?: string;
       applePayCountryCode?: string;
-      brandColor?: string;
+      primaryBrandColor?: string;
+      secondaryBrandColor?: string;
+      hideFooterLogo?: boolean;
       storedCardType?: number;
   }
-  
+
   export enum EcmpActionType {
       Sale = 1,
       Auth = 2,
       Tokenize = 3,
       Verify = 4,
   }
-  
+
   export enum EcmpMockModeType {
       disabled,
       success,
       decline
   }
-  
+
   export enum EcmpScreenDisplayMode {
       hideSuccessFinalPage = 1,
       hideDeclineFinalPage = 2
   }
-  
+
   export type EcmpAdditionalField = {
       type: string;
       value: string;
   }
-  
+
   export type EcmpRecurrentData = {
       register: boolean;
       type?: string;
@@ -91,12 +93,12 @@ const MsdkReactNative = NativeModules.MsdkReactNative
       amount?: number;
       schedule?: EcmpRecurrentDataSchedule[];
   }
-  
+
   export type EcmpRecurrentDataSchedule = {
       date?: string;
       amount?: bigint;
   }
-  
+
   export type EcmpRecipientInfo = {
       walletOwner?: string;
       walletId?: string;
@@ -107,7 +109,7 @@ const MsdkReactNative = NativeModules.MsdkReactNative
       city?: string;
       stateCode?: string;
   }
-  
+
   export const initializePayment = async (params: EcmpPaymentOptions, callback: (result: any) => void) => {
     try {
       const result = await MsdkReactNative.initializePaymentWithOptions(params);
@@ -116,7 +118,7 @@ const MsdkReactNative = NativeModules.MsdkReactNative
       callback(error)
     }
   }
-  
+
   export const getParamsForSignature = async (params: EcmpPaymentInfo): Promise<string> => {
       try {
         const result = await MsdkReactNative.getParamsForSignature(params);
@@ -128,15 +130,15 @@ const MsdkReactNative = NativeModules.MsdkReactNative
   }
 
   export class SignatureGenerator {
-    static generateSignature(paramsToSign: string, secret: string): string { 
+    static generateSignature(paramsToSign: string, secret: string): string {
       let signature = '';
-  
+
       try {
         if (!paramsToSign || !secret) {
           console.error('Missing parameters for signature generation');
           return '';
         }
-        
+
         const hmacDigest = CryptoJS.HmacSHA512(paramsToSign, secret);
         signature = CryptoJS.enc.Base64.stringify(hmacDigest);
         return signature;
@@ -144,9 +146,8 @@ const MsdkReactNative = NativeModules.MsdkReactNative
         console.error('Signature generation error:', e);
         return '';
       }
-  
+
     }
   }
-  
+
   export default SignatureGenerator;
-  

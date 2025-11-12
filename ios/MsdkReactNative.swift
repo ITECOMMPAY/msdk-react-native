@@ -1,12 +1,12 @@
 import React
-import ecommpaySDK
+import EcommpaySDK
 
 @objc(MsdkReactNative)
 class MsdkReactNative: NSObject {
     
     @objc
     func initializePaymentWithOptions(_ options: NSDictionary, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        let sdkFacade: EcommpaySDK = EcommpaySDK()
+        let sdkFacade: Ecommpay = Ecommpay()
         let paymentOptions: PaymentOptions = RCTConvertPluginPaymentOptions.buildPaymentOptions(options)
       
         DispatchQueue.main.async {
