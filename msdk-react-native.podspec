@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
   if defined?(:spm_dependency)
     spm_dependency(s,
       url: 'https://github.com/ITECOMMPAY/mobile-sdk-ios-ui.git',
-      requirement: {kind: 'upToNextMajorVersion', minimumVersion: '4.0.0'},
+      requirement: {kind: 'upToNextMajorVersion', minimumVersion: '4.0.1'},
       products: ['EcommpaySDK']
     )
   else
