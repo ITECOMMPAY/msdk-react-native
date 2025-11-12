@@ -92,6 +92,10 @@ class MsdkReactNativeModule(reactContext: ReactApplicationContext) :
         secondaryBrandColor = colorString
       }
 
+      params.getBoolean("hideFooterLogo")?.let {
+          hideEcommpayLogo = it
+      }
+
       // Stored card type
       storedCardType = params.safeGetInt("storedCardType")
     }

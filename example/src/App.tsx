@@ -189,8 +189,9 @@ export default function App() {
           applePayMerchantID: applePayMerchantID || undefined,
           applePayDescription: applePayDescription || undefined,
           applePayCountryCode: applePayCountryCode || undefined,
-          primaryBrandColor,
-          secondaryBrandColor,
+          primaryBrandColor: primaryBrandColor,
+          secondaryBrandColor: secondaryBrandColor,
+          hideFooterLogo: true,
           storedCardType: parseInt(storedCardType) || undefined
         },
         (result) => {
