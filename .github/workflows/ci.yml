@@ -160,7 +160,6 @@ jobs:
       - name: Build example for iOS
         if: env.turbo_cache_hit != 1
         run: |
-          set -o pipefail
           cd example/ios
           xcodebuild \
             -workspace MsdkReactNativeExample.xcworkspace \
@@ -168,7 +167,8 @@ jobs:
             -configuration Debug \
             -sdk iphonesimulator \
             -destination "platform=iOS Simulator,name=iPhone 16,OS=latest" \
-            -derivedDataPath build \
+            -derivedDataPath ~/DerivedData \
             COMPILER_INDEX_STORE_ENABLE=NO \
             CLANG_ENABLE_MODULE_DEBUGGING=NO \
-            build 2>&1 | xcbeautify && exit ${PIPESTATUS[0]}
+            build > xcodebuild.log 2>&1 || (cat xcodebuild.log | xcbeautify && exit 1)
+          cat xcodebuild.log | xcbeautify
