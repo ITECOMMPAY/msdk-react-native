@@ -1,6 +1,7 @@
 {
   "name": "msdk-react-native",
-  "version": "0.3.0",
+  "version": "0.3.1",
+  "packageManager": "yarn@4.1.1",
   "description": "m",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
@@ -41,7 +42,7 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
+    "prepare": "bob build && tsc --project tsconfig.build.json --declaration --emitDeclarationOnly --outDir lib/typescript --noEmit false",
     "release": "release-it"
   },
   "keywords": [
@@ -82,15 +83,15 @@
     "metro": "^0.83.1",
     "metro-core": "^0.83.1",
     "prettier": "^3.0.3",
-    "react": "19.1.0",
+    "react": "19.1.4",
     "react-native": "0.81.3",
-    "react-native-builder-bob": "^0.40.13",
+    "react-native-builder-bob": "0.39.0",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
     "typescript": "^5.2.2"
   },
   "resolutions": {
-    "@types/react": "^18.2.44"
+    "@types/react": "^19.0.0"
   },
   "peerDependencies": {
     "react": "*",
@@ -101,6 +102,7 @@
   ],
   "jest": {
     "preset": "react-native",
+    "passWithNoTests": true,
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
@@ -164,13 +166,7 @@
     "output": "lib",
     "targets": [
       "commonjs",
-      "module",
-      [
-        "typescript",
-        {
-          "project": "tsconfig.build.json"
-        }
-      ]
+      "module"
     ]
   },
   "create-react-native-library": {

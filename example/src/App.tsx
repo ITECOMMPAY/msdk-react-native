@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,7 +7,7 @@ import {
   Button,
   ScrollView,
   Switch,
-  useColorScheme
+  useColorScheme,
 } from 'react-native';
 import {
   initializePayment,
@@ -18,21 +18,24 @@ import {
   type EcmpAdditionalField,
   type EcmpRecipientInfo,
   type EcmpRecurrentData,
-  getParamsForSignature
+  getParamsForSignature,
 } from 'msdk-react-native';
 import SignatureGenerator from '../../src/index';
 
-export default function App() {
+const App = (): JSX.Element => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [paymentResult, setPaymentResult] = useState<string>('');
 
   // Payment Info State
   const [projectID, setProjectID] = useState<string>('138723');
-  const [paymentID, setPaymentID] = useState<string>('sdk_sample_ui_' + Math.random().toString(36).substring(2, 9));
+  const [paymentID, setPaymentID] = useState<string>(
+    'sdk_sample_ui_' + Math.random().toString(36).substring(2, 9)
+  );
   const [paymentAmount, setPaymentAmount] = useState<string>('100.50');
   const [paymentCurrency, setPaymentCurrency] = useState<string>('USD');
-  const [paymentDescription, setPaymentDescription] = useState<string>('Test payment');
+  const [paymentDescription, setPaymentDescription] =
+    useState<string>('Test payment');
   const [customerID, setCustomerID] = useState<string>('12');
   const [regionCode, setRegionCode] = useState<string>('US');
   const [token, setToken] = useState<string>('');
@@ -41,23 +44,31 @@ export default function App() {
   const [secret, setSecret] = useState<string>('secret key');
 
   // Payment Options State
-  const [actionType, setActionType] = useState<EcmpActionType>(EcmpActionType.Sale);
+  // const [actionType, setActionType] = useState<EcmpActionType>(
+  //   EcmpActionType.Sale
+  // );
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(false);
-  const [mockModeType, setMockModeType] = useState<EcmpMockModeType>(EcmpMockModeType.disabled);
+  const [mockModeType, setMockModeType] = useState<EcmpMockModeType>(
+    EcmpMockModeType.disabled
+  );
   const [hideScanningCards, setHideScanningCards] = useState<boolean>(true);
   const [hideSavedWallets, setHideSavedWallets] = useState<boolean>(false);
   const [primaryBrandColor, setPrimaryBrandColor] = useState<string>('#3498db');
-  const [secondaryBrandColor, setSecondaryBrandColor] = useState<string>('#CAB2FF');
+  const [secondaryBrandColor, setSecondaryBrandColor] =
+    useState<string>('#CAB2FF');
   const [storedCardType, setStoredCardType] = useState<string>('');
 
   // Screen Display Modes
-  const [hideSuccessFinalPage, setHideSuccessFinalPage] = useState<boolean>(false);
-  const [hideDeclineFinalPage, setHideDeclineFinalPage] = useState<boolean>(false);
+  const [hideSuccessFinalPage, setHideSuccessFinalPage] =
+    useState<boolean>(false);
+  const [hideDeclineFinalPage, setHideDeclineFinalPage] =
+    useState<boolean>(false);
 
   // Google Pay
   const [googleMerchantId, setGoogleMerchantId] = useState<string>('');
   const [googleMerchantName, setGoogleMerchantName] = useState<string>('');
-  const [googleIsTestEnvironment, setGoogleIsTestEnvironment] = useState<boolean>(true);
+  const [googleIsTestEnvironment, setGoogleIsTestEnvironment] =
+    useState<boolean>(true);
 
   // Apple Pay
   const [applePayMerchantID, setApplePayMerchantID] = useState<string>('');
@@ -67,7 +78,9 @@ export default function App() {
   // Additional Fields
   const [additionalFieldType, setAdditionalFieldType] = useState<string>('');
   const [additionalFieldValue, setAdditionalFieldValue] = useState<string>('');
-  const [additionalFields, setAdditionalFields] = useState<EcmpAdditionalField[]>([]);
+  const [additionalFields, setAdditionalFields] = useState<
+    EcmpAdditionalField[]
+  >([]);
 
   // Recipient Info
   const [showRecipientInfo, setShowRecipientInfo] = useState<boolean>(false);
@@ -95,10 +108,13 @@ export default function App() {
 
   const addAdditionalField = () => {
     if (additionalFieldType && additionalFieldValue) {
-      setAdditionalFields([...additionalFields, {
-        type: additionalFieldType,
-        value: additionalFieldValue
-      }]);
+      setAdditionalFields([
+        ...additionalFields,
+        {
+          type: additionalFieldType,
+          value: additionalFieldValue,
+        },
+      ]);
       setAdditionalFieldType('');
       setAdditionalFieldValue('');
     }
@@ -111,7 +127,7 @@ export default function App() {
   const handlePayment = async (paymentActionType: EcmpActionType) => {
     try {
       const paymentInfoWithoutSignature: EcmpPaymentInfo = {
-        projectID: parseInt(projectID) || 0,
+        projectID: parseInt(projectID, 10) || 0,
         paymentID: paymentID,
         paymentAmount: parseFloat(paymentAmount) || 0,
         paymentCurrency: paymentCurrency,
@@ -124,13 +140,17 @@ export default function App() {
         hideSavedWallets: hideSavedWallets,
       };
 
-      const paramsForSignature = await getParamsForSignature(paymentInfoWithoutSignature);
+      const paramsForSignature = await getParamsForSignature(
+        paymentInfoWithoutSignature
+      );
 
-
-      const signature = SignatureGenerator.generateSignature(paramsForSignature, secret);
+      const signature = SignatureGenerator.generateSignature(
+        paramsForSignature,
+        secret
+      );
 
       const paymentInfo = {
-        projectID: parseInt(projectID) || 0,
+        projectID: parseInt(projectID, 10) || 0,
         paymentID: paymentID,
         paymentAmount: parseFloat(paymentAmount) || 0,
         paymentCurrency: paymentCurrency,
@@ -141,36 +161,42 @@ export default function App() {
         languageCode: languageCode || undefined,
         receiptData: receiptData || undefined,
         hideSavedWallets: hideSavedWallets,
-        signature: signature
-      }
+        signature: signature,
+      };
 
       const screenDisplayModes = [];
-      if (hideSuccessFinalPage) screenDisplayModes.push(EcmpScreenDisplayMode.hideSuccessFinalPage);
-      if (hideDeclineFinalPage) screenDisplayModes.push(EcmpScreenDisplayMode.hideDeclineFinalPage);
+      if (hideSuccessFinalPage)
+        screenDisplayModes.push(EcmpScreenDisplayMode.hideSuccessFinalPage);
+      if (hideDeclineFinalPage)
+        screenDisplayModes.push(EcmpScreenDisplayMode.hideDeclineFinalPage);
 
-      const recipientInfo: EcmpRecipientInfo | undefined = showRecipientInfo ? {
-        walletOwner: walletOwner || undefined,
-        walletId: walletId || undefined,
-        country: recipientCountry || undefined,
-        pan: pan || undefined,
-        cardHolder: cardHolder || undefined,
-        address: address || undefined,
-        city: city || undefined,
-        stateCode: stateCode || undefined
-      } : undefined;
+      const recipientInfo: EcmpRecipientInfo | undefined = showRecipientInfo
+        ? {
+            walletOwner: walletOwner || undefined,
+            walletId: walletId || undefined,
+            country: recipientCountry || undefined,
+            pan: pan || undefined,
+            cardHolder: cardHolder || undefined,
+            address: address || undefined,
+            city: city || undefined,
+            stateCode: stateCode || undefined,
+          }
+        : undefined;
 
-      const recurrentData: EcmpRecurrentData | undefined = showRecurrentData ? {
-        register: recurrentRegister,
-        type: recurrentType || undefined,
-        expiryDay: expiryDay || undefined,
-        expiryMonth: expiryMonth || undefined,
-        expiryYear: expiryYear || undefined,
-        period: period || undefined,
-        interval: parseInt(interval) || undefined,
-        time: time || undefined,
-        startDate: startDate || undefined,
-        scheduledPaymentID: scheduledPaymentID || undefined
-      } : undefined;
+      const recurrentData: EcmpRecurrentData | undefined = showRecurrentData
+        ? {
+            register: recurrentRegister,
+            type: recurrentType || undefined,
+            expiryDay: expiryDay || undefined,
+            expiryMonth: expiryMonth || undefined,
+            expiryYear: expiryYear || undefined,
+            period: period || undefined,
+            interval: parseInt(interval, 10) || undefined,
+            time: time || undefined,
+            startDate: startDate || undefined,
+            scheduledPaymentID: scheduledPaymentID || undefined,
+          }
+        : undefined;
 
       await initializePayment(
         {
@@ -178,8 +204,10 @@ export default function App() {
           paymentInfo,
           isDarkTheme,
           mockModeType,
-          screenDisplayModes: screenDisplayModes.length > 0 ? screenDisplayModes : undefined,
-          additionalFields: additionalFields.length > 0 ? additionalFields : undefined,
+          screenDisplayModes:
+            screenDisplayModes.length > 0 ? screenDisplayModes : undefined,
+          additionalFields:
+            additionalFields.length > 0 ? additionalFields : undefined,
           recipientInfo,
           recurrentData,
           hideScanningCards,
@@ -192,7 +220,7 @@ export default function App() {
           primaryBrandColor: primaryBrandColor,
           secondaryBrandColor: secondaryBrandColor,
           hideFooterLogo: true,
-          storedCardType: parseInt(storedCardType) || undefined
+          storedCardType: parseInt(storedCardType, 10) || undefined,
         },
         (result) => {
           console.log('Payment result:', result);
@@ -217,6 +245,7 @@ export default function App() {
         <TextInput
           style={dynamicStyles.input}
           placeholder="Project ID"
+          placeholderTextColor={isDark ? '#8e8e93' : '#999'}
           value={projectID}
           onChangeText={setProjectID}
           keyboardType="numeric"
@@ -321,11 +350,11 @@ export default function App() {
         />
 
         <TextInput
-            style={dynamicStyles.input}
-            placeholder="Secondary brand Color (#hex)"
-            placeholderTextColor={isDark ? '#CAB2FF' : '#999'}
-            value={secondaryBrandColor}
-            onChangeText={setSecondaryBrandColor}
+          style={dynamicStyles.input}
+          placeholder="Secondary brand Color (#hex)"
+          placeholderTextColor={isDark ? '#CAB2FF' : '#999'}
+          value={secondaryBrandColor}
+          onChangeText={setSecondaryBrandColor}
         />
 
         <View style={dynamicStyles.switchRow}>
@@ -335,22 +364,34 @@ export default function App() {
 
         <View style={dynamicStyles.switchRow}>
           <Text style={dynamicStyles.switchLabel}>Hide Saved Wallets</Text>
-          <Switch value={hideSavedWallets} onValueChange={setHideSavedWallets} />
+          <Switch
+            value={hideSavedWallets}
+            onValueChange={setHideSavedWallets}
+          />
         </View>
 
         <View style={dynamicStyles.switchRow}>
           <Text style={dynamicStyles.switchLabel}>Hide Scanning Cards</Text>
-          <Switch value={hideScanningCards} onValueChange={setHideScanningCards} />
+          <Switch
+            value={hideScanningCards}
+            onValueChange={setHideScanningCards}
+          />
         </View>
 
         <View style={dynamicStyles.switchRow}>
           <Text style={dynamicStyles.switchLabel}>Hide Success Final Page</Text>
-          <Switch value={hideSuccessFinalPage} onValueChange={setHideSuccessFinalPage} />
+          <Switch
+            value={hideSuccessFinalPage}
+            onValueChange={setHideSuccessFinalPage}
+          />
         </View>
 
         <View style={dynamicStyles.switchRow}>
           <Text style={dynamicStyles.switchLabel}>Hide Decline Final Page</Text>
-          <Switch value={hideDeclineFinalPage} onValueChange={setHideDeclineFinalPage} />
+          <Switch
+            value={hideDeclineFinalPage}
+            onValueChange={setHideDeclineFinalPage}
+          />
         </View>
       </View>
 
@@ -361,17 +402,23 @@ export default function App() {
           <Button
             title="Disabled"
             onPress={() => setMockModeType(EcmpMockModeType.disabled)}
-            color={mockModeType === EcmpMockModeType.disabled ? '#007AFF' : '#8E8E93'}
+            color={
+              mockModeType === EcmpMockModeType.disabled ? '#007AFF' : '#8E8E93'
+            }
           />
           <Button
             title="Success"
             onPress={() => setMockModeType(EcmpMockModeType.success)}
-            color={mockModeType === EcmpMockModeType.success ? '#007AFF' : '#8E8E93'}
+            color={
+              mockModeType === EcmpMockModeType.success ? '#007AFF' : '#8E8E93'
+            }
           />
           <Button
             title="Decline"
             onPress={() => setMockModeType(EcmpMockModeType.decline)}
-            color={mockModeType === EcmpMockModeType.decline ? '#007AFF' : '#8E8E93'}
+            color={
+              mockModeType === EcmpMockModeType.decline ? '#007AFF' : '#8E8E93'
+            }
           />
         </View>
       </View>
@@ -395,7 +442,10 @@ export default function App() {
         />
         <View style={dynamicStyles.switchRow}>
           <Text style={dynamicStyles.switchLabel}>Google Test Environment</Text>
-          <Switch value={googleIsTestEnvironment} onValueChange={setGoogleIsTestEnvironment} />
+          <Switch
+            value={googleIsTestEnvironment}
+            onValueChange={setGoogleIsTestEnvironment}
+          />
         </View>
       </View>
 
@@ -446,8 +496,14 @@ export default function App() {
 
         {additionalFields.map((field, index) => (
           <View key={index} style={dynamicStyles.fieldRow}>
-            <Text style={dynamicStyles.fieldText}>{field.type}: {field.value}</Text>
-            <Button title="Remove" onPress={() => removeAdditionalField(index)} color="#FF3B30" />
+            <Text style={dynamicStyles.fieldText}>
+              {field.type}: {field.value}
+            </Text>
+            <Button
+              title="Remove"
+              onPress={() => removeAdditionalField(index)}
+              color="#FF3B30"
+            />
           </View>
         ))}
       </View>
@@ -456,7 +512,10 @@ export default function App() {
       <View style={dynamicStyles.section}>
         <View style={dynamicStyles.switchRow}>
           <Text style={dynamicStyles.sectionTitle}>Recipient Information</Text>
-          <Switch value={showRecipientInfo} onValueChange={setShowRecipientInfo} />
+          <Switch
+            value={showRecipientInfo}
+            onValueChange={setShowRecipientInfo}
+          />
         </View>
 
         {showRecipientInfo && (
@@ -525,14 +584,22 @@ export default function App() {
       <View style={dynamicStyles.section}>
         <View style={dynamicStyles.switchRow}>
           <Text style={dynamicStyles.sectionTitle}>Recurrent Data</Text>
-          <Switch value={showRecurrentData} onValueChange={setShowRecurrentData} />
+          <Switch
+            value={showRecurrentData}
+            onValueChange={setShowRecurrentData}
+          />
         </View>
 
         {showRecurrentData && (
           <>
             <View style={dynamicStyles.switchRow}>
-              <Text style={dynamicStyles.switchLabel}>Register for Recurrent</Text>
-              <Switch value={recurrentRegister} onValueChange={setRecurrentRegister} />
+              <Text style={dynamicStyles.switchLabel}>
+                Register for Recurrent
+              </Text>
+              <Switch
+                value={recurrentRegister}
+                onValueChange={setRecurrentRegister}
+              />
             </View>
             <TextInput
               style={dynamicStyles.input}
@@ -638,102 +705,104 @@ export default function App() {
       ) : null}
     </ScrollView>
   );
-}
+};
 
-const createDynamicStyles = (isDark: boolean) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: isDark ? '#000' : '#f5f5f5',
-    padding: 16
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: isDark ? '#fff' : '#333'
-  },
-  section: {
-    backgroundColor: isDark ? '#1c1c1e' : '#fff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-    color: isDark ? '#fff' : '#333'
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: isDark ? '#3a3a3c' : '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    fontSize: 16,
-    backgroundColor: isDark ? '#2c2c2e' : '#fff',
-    color: isDark ? '#fff' : '#000',
-    placeholderTextColor: isDark ? '#8e8e93' : '#999'
-  },
-  switchRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    marginBottom: 8
-  },
-  switchLabel: {
-    fontSize: 16,
-    color: isDark ? '#fff' : '#333',
-    flex: 1
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    flexWrap: 'wrap',
-    gap: 10
-  },
-  fieldRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: isDark ? '#2c2c2e' : '#f8f8f8',
-    borderRadius: 6,
-    marginBottom: 8
-  },
-  fieldText: {
-    flex: 1,
-    fontSize: 14,
-    color: isDark ? '#fff' : '#333'
-  },
-  resultContainer: {
-    backgroundColor: isDark ? '#1c1c1e' : '#fff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
-  },
-  resultTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: isDark ? '#fff' : '#333'
-  },
-  resultText: {
-    fontSize: 14,
-    color: isDark ? '#8e8e93' : '#666',
-    fontFamily: 'monospace'
-  }
-});
+export default App;
+
+const createDynamicStyles = (isDark: boolean) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: isDark ? '#000' : '#f5f5f5',
+      padding: 16,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 20,
+      color: isDark ? '#fff' : '#333',
+    },
+    section: {
+      backgroundColor: isDark ? '#1c1c1e' : '#fff',
+      borderRadius: 8,
+      padding: 16,
+      marginBottom: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 12,
+      color: isDark ? '#fff' : '#333',
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: isDark ? '#3a3a3c' : '#ddd',
+      borderRadius: 8,
+      padding: 12,
+      marginBottom: 12,
+      fontSize: 16,
+      backgroundColor: isDark ? '#2c2c2e' : '#fff',
+      color: isDark ? '#fff' : '#000',
+    },
+    switchRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 8,
+      marginBottom: 8,
+    },
+    switchLabel: {
+      fontSize: 16,
+      color: isDark ? '#fff' : '#333',
+      flex: 1,
+    },
+    buttonGroup: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      flexWrap: 'wrap',
+      gap: 10,
+    },
+    fieldRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      backgroundColor: isDark ? '#2c2c2e' : '#f8f8f8',
+      borderRadius: 6,
+      marginBottom: 8,
+    },
+    fieldText: {
+      flex: 1,
+      fontSize: 14,
+      color: isDark ? '#fff' : '#333',
+    },
+    resultContainer: {
+      backgroundColor: isDark ? '#1c1c1e' : '#fff',
+      borderRadius: 8,
+      padding: 16,
+      marginBottom: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    resultTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 8,
+      color: isDark ? '#fff' : '#333',
+    },
+    resultText: {
+      fontSize: 14,
+      color: isDark ? '#8e8e93' : '#666',
+      fontFamily: 'monospace',
+    },
+  });

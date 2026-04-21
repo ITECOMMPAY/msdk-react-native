@@ -150,7 +150,6 @@ internal struct PluginPaymentOptions: Decodable {
 }
 
 // MARK: - RCTConvert Extensions
-@objc(PaymentOptions)
 class RCTConvertPluginPaymentOptions: RCTConvert {
 
     @objc static func buildPaymentOptionsFromInfo(_ json: NSDictionary) -> PaymentOptions {
