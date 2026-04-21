@@ -168,11 +168,7 @@ jobs:
             -configuration Debug \
             -sdk iphonesimulator \
             -destination "platform=iOS Simulator,name=iPhone 16,OS=latest" \
-            -parallelizeTargets \
-            CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
-            GCC_OPTIMIZATION_LEVEL=0 \
-            GCC_PRECOMPILE_PREFIX_HEADER=YES \
-            ASSETCATALOG_COMPILER_OPTIMIZATION=time \
-            DEBUG_INFORMATION_FORMAT=dwarf \
+            -derivedDataPath build \
             COMPILER_INDEX_STORE_ENABLE=NO \
+            CLANG_ENABLE_MODULE_DEBUGGING=NO \
             build 2>&1 | xcbeautify && exit ${PIPESTATUS[0]}
